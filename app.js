@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 5000;
 require("dotenv").config()
 require("./models/user");
 require("./models/post");
+require('./models/otp');
 
 app.use(express.json());
 app.use(require("./routes/auth"));
