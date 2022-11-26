@@ -34,3 +34,6 @@ Full-Stack Instgram Clone using MERN Stack.
 ## Screenshots:
 
 ![alt text](https://github.com/pk-14/social-media-app-mern/blob/main/1.png)
+![alt text](https://github.com/pk-14/social-media-app-mern/blob/main/2.png)
+![alt text](https://github.com/pk-14/social-media-app-mern/blob/main/3.png)
+![alt text](https://github.com/pk-14/social-media-app-mern/blob/main/4.png)
