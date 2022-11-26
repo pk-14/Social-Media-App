@@ -32,3 +32,5 @@ Full-Stack Instgram Clone using MERN Stack.
 - See Followers/Following of Users
 
 ## Screenshots:
+
+![alt text](https://github.com/pk-14/social-media-app-mern/blob/main/1.png)
