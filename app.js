@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const { MONGOURL } = require("./config/keys");
 require("dotenv").config();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 1433;
 
 mongoose.connect(MONGOURL);
 mongoose.connection.on("connected", () => {
