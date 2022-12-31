@@ -1,42 +1,45 @@
-import React, {useContext,useRef,useEffect,useState} from 'react';
-import {Link, useHistory} from 'react-router-dom';
-import {userContext} from '../App';
-import M from 'materialize-css';
+import React,{useContext,useRef,useEffect,useState} from "react";
+import { Link, useHistory } from "react-router-dom";
+import {UserContext} from '../App'
+import M from 'materialize-css'
+const p='profile/';
 
-
-const NavBar = () => {
-  const searchModal = useRef(null);
-  const [searchUser,setSearchUser] = useState('');
-  let [searchResult,setSearchResult] = useState([]);
-  const {state, dispatch} = useContext(userContext);
-  const history = useHistory();
+const Navbar = () => {
+  const searchModal = useRef(null)
+  const [searchUser,setSearchUser] = useState('')
+  let [searchResult,setSearchResult] = useState([])
+  const {state,dispatch} = useContext(UserContext)
+  const history = useHistory()
   useEffect(()=>{
     M.Modal.init(searchModal.current)
-  },[]);
+  },[])
   const renderList = () => {
     if(state){
-      return([
+      return [
         <div>
-          <li><i data-target="modal1" className="large material-icons modal-trigger" style={{color:"black",cursor: "pointer"}}>search</i></li>
-          <li><Link to="/profile">Profile</Link></li>,
-          <li><Link to="/create">Create a Post</Link></li>,
-          <li><Link to="/myfollowingpost">My Following Posts</Link></li>,
-          <li>
-            <button className="btn waves-effect waves-light #c62828 red darken-3" type="submit" name="action" onClick={() => {
+          <li key="1"><i data-target="modal1" className="large material-icons modal-trigger" style={{color:"black",cursor: "pointer"}}>search</i></li>
+          <li key="2"><Link to="/createpost">Create post</Link></li>
+          <li key="3"><Link to="/profile">Profile</Link></li>
+          <li key="4"><Link to="/subposts">My Following Posts</Link></li>
+          <button class="btn #e53935 red darken-1"
+            onClick={()=>{
               localStorage.clear()
-              dispatch({type: "CLEAR"})
-              history.push("/signin")
-            }}>
-                    Logout
-            </button>
-          </li>
-        </div>
-      ])
-    }else{
-      return([
-        <li><Link to="/signin" >Login</Link></li>,
-        <li><Link to="/signup">Signup</Link></li>
-    ])
+              dispatch({type:"CLEAR"})
+              history.push('/login')
+            } 
+          }>
+            Logout
+          </button>
+          </div>
+      ];
+    }
+    else{
+      return [
+        <>
+          <li key="5"><Link to="/login">Login</Link></li>
+          <li key="6"><Link to="/signup">Signup</Link></li>
+        </>,
+      ];
     }
   }
 
@@ -56,14 +59,16 @@ const NavBar = () => {
     })
   }
 
-    return(
-        <nav>
-        <div className="nav-wrapper white">
-          <Link to={state ? "/" : '/signin'} className="brand-logo left">Instagram</Link>
-          <ul id="nav-mobile" className="right hide-on-med-and-down">
-            {renderList()}
-          </ul>
-          <div id="modal1" className="modal"  ref={searchModal} >
+  return (
+    <nav>
+      <div className="nav-wrapper white">
+        <Link to={state ? "/" : "/login"} className="brand-logo left">
+          Instagram
+        </Link>
+        <ul id="nav-mobile" className="right">
+          {renderList()}
+        </ul>
+        <div id="modal1" className="modal"  ref={searchModal} >
           <div className="modal-content" style={{color:"black"}}>
             <input type="text" placeholder="Search Users" value={searchUser} onChange={(e)=>fetchUsers((e.target.value))} ></input>
             <div>
@@ -82,10 +87,11 @@ const NavBar = () => {
           <div class="modal-footer">
           <button class="modal-close waves-effect waves-green btn-flat" onClick={()=>{setSearchUser(''); setSearchResult([])}}>Close</button>
           </div>
-          </div>
-        </div>
-      </nav>
-    )
-}
 
-export default NavBar;
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

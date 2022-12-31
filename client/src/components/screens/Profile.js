@@ -1,72 +1,82 @@
-import React,{useEffect, useState, useContext} from "react";
-import {userContext} from '../../App';
-import M from 'materialize-css';
+import React, { useEffect, useState,useContext } from 'react'
+import { UserContext } from '../../App'
+import M from 'materialize-css'
 
-const Profile = () => {
-    const [mypics, setPics] = useState([]);
-    const {state, dispatch} = useContext(userContext);
-    const [image,setImage] = useState("");
-    const [password,setPassword] = useState("");
+
+const Profile = ()=>{
+    
+    const [mypics,setPics] = useState([])
+    const {state,dispatch} = useContext(UserContext)
+    const [profilepic,setProfilepic] = useState("")
+    const [password,setPassword] = useState("")
     const [loading ,setLoading] = useState(false);
-
+    
     useEffect(()=>{
         M.AutoInit();
-    },[]);
+    },[])
 
-    useEffect(() => {
-        if(image){
-        setLoading(true);
-        const data = new FormData();
-        data.append("file", image);
-        data.append("upload_preset", "insta-clone");
-        data.append("cloud_name", "dzxv0vqnd"); 
-
-        fetch("https://api.cloudinary.com/v1_1/dzxv0vqnd/image/upload",{
-            method : "post",
-            body : data
-        }).then(res => res.json())
-        .then(data => {
-            
-            fetch('/updatepic', {
-                method: "put",
-                headers: {
-                    "Content-Type" : "application/json",
-                    "Authorization" : "Bearer " + localStorage.getItem("jwt")
-                },
-                body: JSON.stringify({
-                    pic : data.url
-                })
-            }).then(res => res.json())
-            .then(result => {
-                localStorage.setItem("user", JSON.stringify({...state, pic : result.pic}))
-                dispatch({type: "UPDATEPIC", payload: result.pic});
-                const modal3 = document.getElementById("modal3");
-                var instance = M.Modal.getInstance(modal3);
-                setLoading(false);
-                instance.close();
-            })
-            .catch(err => console.log(err))
+    useEffect(()=>{
+        fetch('/myposts',{
+            headers:{
+                "Authorization":"Bearer "+localStorage.getItem('jwt')
+            }
         })
-        .catch(err => console.log(err))
-        }
-    }, [image])
+        .then(res=>res.json())
+        .then(result=>{
+            setPics(result.myposts)
+        })
+    },[])
 
-    const updatePhoto = (file) => {
-        setImage(file)
+    useEffect(()=>{
+        if (profilepic) {
+            setLoading(true);
+            const data = new FormData()
+            data.append("file",profilepic)
+            data.append("upload_preset","insta-clone")
+            data.append("cloud_name","instaclonewebapp")
+            fetch('https://api.cloudinary.com/v1_1/instaclonewebapp/image/upload',{
+                method:"POST",
+                body:data
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                fetch('/updatepic',{
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "Authorization":"Bearer "+localStorage.getItem('jwt')
+                    },
+                    body:JSON.stringify({
+                        profilepic:data.url
+                    })
+                })
+                .then(res=>res.json())
+                .then(result=>{
+                    
+                    console.log(result)
+                    localStorage.setItem("user",JSON.stringify({...state,profilepic:result.profilepic}))
+                    dispatch({type:"UPDATEPIC",payload:result.profilepic});
+                    const modal3 = document.getElementById("modal3");
+                    var instance = M.Modal.getInstance(modal3);
+                    setLoading(false);
+                    instance.close();
+
+                    
+                })
+                .catch(err=>{
+                    console.log(err)
+                })
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        }   
+    },[profilepic])
+
+    const updateProfilepic = (file)=>{
+        setProfilepic(file);
         
     }
-
-    useEffect(() => {
-        fetch("/myposts", {
-            headers: {
-                "Authorization" : "Bearer " + localStorage.getItem("jwt")
-            }
-        }).then(res => res.json())
-        .then(result => {
-            setPics(result.mypost)
-        })
-    }, [])
-
     const updatePassword = (password)=>{
         fetch('/changepassword',{
             method:'put',
@@ -90,44 +100,47 @@ const Profile = () => {
             console.log(err)
           })
     }
-
+    // const openPost = (item)=>{ 
+    //     setPostData(item)
+    //     const modal4 = document.getElementById("modal4");
+    //     var instance = M.Modal.getInstance(modal4);
+    //     instance.open();
+    // }
+    
     return(
-        <div style={{maxWidth: "550px", margin: "0px auto"}}>
-            <div style={{margin: "18px 0px", borderBottom: "1px solid grey"}}> 
-                <div style={{display: "flex", justifyContent: "space-around"}}>
-                    <div>
-                        <img style={{width:"160px", height:"160px", borderRadius : "80px"}}
-                            src={state ? state.pic : "Loading..."}
-                        />
+        <div style={{maxWidth:"600px",margin:"0px auto"}}>
+            <div style={{display:"flex",justifyContent:"space-around",marginTop:"20px",borderBottom:"1px solid grey"}}>
+                <div>
+                    <img style={{width:"160px",height:"160px",borderRadius:"80px"}} src={state?state.profilepic:"loading"}/>
+                </div>
+                <div>
+                    
+                    <h4>{state?state.name:"Loading"}</h4>
+                    <div style={{display:"flex",justifyContent:"space-between",width:"110%"}}>
+                        <h6> { mypics.length } posts</h6>
+                        <h6>{state?state.followers.length:"Loading"} followers</h6>
+                        <h6>{state?state.following.length:"Loading"} following</h6> 
                     </div>
                     <div>
-                        <h4>{state ? state.name : "loading"}</h4>
-                        <h5>{state ? state.email : "loading"}</h5>
-                        <div style={{display: "flex", justifyContent: "space-between", width:"115%"}}>
-                            <h6>{mypics.length} Posts</h6>
-                            <h6>{state ? state.followers.length : '0'} Followers</h6>
-                            <h6>{state ? state.following.length : '0'} Following</h6>
-                        </div>
+                    <a class='dropdown-trigger btn'  data-target='dropdown1'>Options</a>
+                    <ul id='dropdown1' class='dropdown-content'>
+                    <li>  <a data-target="modal2" class=" modal-trigger">Change Password</a></li>
+                    <li class="divider" tabindex="-1"></li>
+                    <li><a data-target="modal3" class=" modal-trigger">Update Profile Pic</a></li>
+                    </ul>
                     </div>
-                    <div>
-                        <a class='dropdown-trigger btn-floating btn-large waves-effect waves-light blue'  data-target='dropdown1'><i class="material-icons">dehaze</i></a>
-                        <ul id='dropdown1' class='dropdown-content'>
-                        <li>  <a data-target="modal2" class=" modal-trigger">Change Password</a></li>
-                        <li class="divider" tabindex="-1"></li>
-                        <li><a data-target="modal3" class=" modal-trigger">Update Profile Pic</a></li>
-                        </ul>
-                    </div>
-                </div>    
+                    
+                </div>
             </div>
-
-            <div className="gallery">
+            <div className='gallery' style={{}}>
                 {
-                    mypics.map(item => {
+                    mypics.map(item=>{
                         return(
-                            <img className="item" src={item.photo} alt={item.title} key={item._id}/>
+                            <img style={{cursor:"pointer"}}  role="button" key={item._id} className='item' src={item.photo}/>
                         )
                     })
                 }
+                
             </div>
             <div id="modal2" className="modal">
                 <div className="modal-content" style={{ color: "black" }}>
@@ -140,17 +153,46 @@ const Profile = () => {
             </div>
             <div id="modal3" className="modal">
                 <div className="modal-content" style={{ color: "black" }}>
-                    <input type="file" onChange={(e)=>updatePhoto((e.target.files[0]))} />
+                    <input type="file" onChange={(e)=>updateProfilepic((e.target.files[0]))} />
                 </div>
                 <div>
                     {loading && <h4 style={{fontSize:"16px" , color:"green",textAlign:"center"}}>Uploading ...</h4>}
                 </div>
                 <div class="modal-footer">
-                    <button class="modal-close waves-effect waves-green btn-flat" onClick={() => {setImage('')}}>Close</button>
+                    <button class="modal-close waves-effect waves-green btn-flat" onClick={() => {setProfilepic('')}}>Close</button>
                 </div>
             </div>
+            {/* <div id="modal5" className="modal">
+                <div className="modal-content" style={{ color: "black" }}>
+                    <div>
+                        <ul className="collection">
+                            {state.followers.map(item => {
+                                return <a href={(item._id === state._id ? '/profile' : ('/profile/' + item._id))} className="collection-item" onClick={() => { }}>{item.name}</a>
+                            })}
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-close waves-effect waves-green btn-flat">Close</button>
+                </div>
+            </div> */}
+            {/* <div id="modal4" className="modal" >
+                <div className="modal-content" style={{ color: "black" }}>
+                    <div className='flex-container'>
+                        <div className='postimagediv'>
+                            <img className='postimage' src={postData.photo}></img>
+                        </div>
+                        <div>
+                             <h6>{postData.postedBy.name}</h6>
+                        </div>
+                        <div><button class="modal-close waves-effect waves-green btn-flat" onClick={() => {setPostData([])}}>Close</button></div>
+                    </div>
+                    
+                </div>
+               
+            </div> */}
         </div>
     )
-};
+}
 
-export default Profile;
+export default Profile

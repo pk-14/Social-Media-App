@@ -1,12 +1,12 @@
 import React, { useState,useContext } from "react";
 import { useHistory } from "react-router-dom";
-import {userContext} from '../../App'
+import {UserContext} from '../../App'
 import { Redirect } from "react-router-dom";
 import M from 'materialize-css'
 
 
 const Resetpass = () => {
-  const {state,dispatch} = useContext(userContext)
+  const {state,dispatch} = useContext(UserContext)
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
   const [otp,setOtp] = useState("")
@@ -69,9 +69,9 @@ const Resetpass = () => {
   return (
     <div className="mycard">
       <div className="card auth-card input-field">
-      <h2 className="brand-logo">Instagram</h2>
+        <h2>Instagram</h2>
         {!otpform ?
-        <><input type="text" placeholder="Email" value={email} onChange={(e)=>setEmail((e.target.value))} ></input>
+        <><input type="text" placeholder="email" value={email} onChange={(e)=>setEmail((e.target.value))} ></input>
         <button className="btn waves-effect waves-light #42a5f5 blue lighten-1" onClick={()=>PostData()}> Send OTP </button></>
         :<>
         <input type="text" placeholder="OTP" value={otp} onChange={(e)=>setOtp((e.target.value))}></input>

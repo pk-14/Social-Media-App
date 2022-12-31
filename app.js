@@ -1,44 +1,35 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const mongoose  = require("mongoose");
-const { MONGOURL } = require("./config/keys");
-const path = require("path");
-const PORT = process.env.PORT || 5000;
+const mongoose = require('mongoose');
+const {MONGOURI} = require('./config/keys');
 
-require("dotenv").config()
-require("./models/user");
-require("./models/post");
-require('./models/otp');
+const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
-app.use(require("./routes/auth"));
-app.use(require("./routes/post"));
-app.use(require("./routes/user"));
-app.use(express.static(path.resolve(__dirname, "./client/build")));
-app.get("*", function (request, response) {
-  response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
-});
+mongoose.connect(MONGOURI)
+mongoose.connection.on('connected',()=>{
+    console.log("Connected to dbms");
+})
+mongoose.connection.on('error',(err)=>{
+    console.log(err);
+})
 
+app.listen(PORT,()=>{
+    console.log("Server is running on",PORT)
+})
 
-  mongoose.connect(MONGOURL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+require('./models/user');
+require('./models/post');
+require('./models/otp')
 
-mongoose.connection.on("connected", () => {
-    console.log("Connected to MONGODB")
-});
-mongoose.connection.on("error", (err) => {
-    console.log(" NOT Connected to MONGODB", err)
-}); 
+app.use(express.json())
+app.use(require('./routes/auth'))
+app.use(require('./routes/post'))
+app.use(require('./routes/user'))
 
-if(process.env.NODE_ENV == "production"){
-  app.use(express.static('client/build'))
-  app.get("*", (req,res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
-  })
+if(process.env.NODE_ENV=="production"){
+    app.use(express.static('client/build'))
+    const path  = require('path')
+    app.get("*",(req,res)=>{
+        res.sendFile(path.resolve(__dirname,'client','build','index.html'))
+    })
 }
-
-app.listen(PORT, () => {
-    console.log("server is running");
-});
